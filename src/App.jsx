@@ -412,10 +412,12 @@ export default function App() {
           width: 100%;
           display: flex;
           justify-content: center;
+          transform: scale(0.75);
+          transform-origin: center center;
         }
         @keyframes cardBreathing {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-12px); }
+          0%, 100% { transform: scale(0.75) translateY(0); }
+          50% { transform: scale(0.75) translateY(-12px); }
         }
 
         .card-wrapper {
