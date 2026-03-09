@@ -412,7 +412,7 @@ export default function App() {
           width: 100%;
           display: flex;
           justify-content: center;
-          transform: scale(0.75);
+          transform: scale(0.8);
           transform-origin: center center;
         }
         @keyframes cardBreathing {
