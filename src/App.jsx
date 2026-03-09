@@ -226,7 +226,8 @@ export default function App() {
 
   useEffect(() => {
     const audio = new Audio();
-    audio.crossOrigin = "anonymous"; 
+    // Không set crossOrigin mặc định — iOS Safari sẽ block playback
+    // nếu CDN không có CORS header. crossOrigin chỉ cần cho AudioContext analyzer.
     audio.src = CONFIG.BGM_URL;
     audio.loop = true;
     audioRef.current = audio;
@@ -241,6 +242,14 @@ export default function App() {
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       const ctx = new AudioContext();
+      // iOS Safari khởi động AudioContext ở trạng thái "suspended".
+      // Phải gọi resume() trong user gesture để unlock audio.
+      ctx.resume();
+
+      // Cần crossOrigin để dùng createMediaElementSource — thử set lại.
+      // Nếu CDN không có CORS thì sẽ throw và fallback.
+      audioRef.current.crossOrigin = "anonymous";
+
       const source = ctx.createMediaElementSource(audioRef.current);
       const analyzer = ctx.createAnalyser();
       
