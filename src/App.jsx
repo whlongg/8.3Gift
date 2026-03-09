@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Heart, Sparkles, ArrowLeft, Star, Cloud, Music } from 'lucide-react';
 
 // ==========================================
-// ⚙️ 1. CONFIGURATION & DATA (Chỉnh Text & Ảnh ở đây)
+// ⚙️ 1. CONFIGURATION & DATA 
 // ==========================================
 const CONFIG = {
   BGM_URL: "https://cdn.pixabay.com/audio/2026/03/09/audio_4e7712178b.mp3",
@@ -34,23 +34,20 @@ const CONFIG = {
   }
 };
 
-// ==========================================
-// 🎛️ 2. AUDIO & BEAT CONFIG
-// ==========================================
 const AUDIO_CONFIG = {
-  BASS_THRESHOLD: 0.85,     // Ngưỡng lọc tạp âm (0.0 -> 1.0). Càng cao càng chỉ bắt tiếng Bass mạnh (không bắt nhầm).
-  BASS_POWER_CURVE: 2.5,   // Độ gắt của nhịp đập (Hàm mũ). Số càng lớn đập càng dứt khoát.
-  LED_BASE_SPEED: 0.4,    // Tốc độ chạy viền LED lúc bình thường (Cực chậm, mượt).
-  LED_BEAT_BOOST: 2.7,     // Độ tăng tốc của LED khi có tiếng trống đập.
-  SMOOTH_ATTACK: 0.35,     // Tốc độ "Phồng lên" của khung ảnh & nền khi có beat.
-  SMOOTH_DECAY: 0.05,      // Tốc độ "Xẹp xuống" êm ái khi dứt beat.
-  MAX_FRAME_SCALE: 0.1,   // Độ phóng to tối đa của KHUNG ẢNH (Polaroid).
-  MAX_IMAGE_SCALE: 0.13,   // Độ phóng to tối đa của ẢNH BÊN TRONG (Tạo hiệu ứng parallax 3D với khung).
-  MAX_BG_PULSE: 0.3        // Độ nháy to nhỏ của mây/sao/chuột ở background.
+  BASS_THRESHOLD: 0.85,    
+  BASS_POWER_CURVE: 2.5,   
+  LED_BASE_SPEED: 0.4,    
+  LED_BEAT_BOOST: 2.7,     
+  SMOOTH_ATTACK: 0.35,     
+  SMOOTH_DECAY: 0.05,      
+  MAX_FRAME_SCALE: 0.08,   
+  MAX_IMAGE_SCALE: 0.1,   
+  MAX_BG_PULSE: 0.15       
 };
 
 // ==========================================
-// COMPONENT PHỤ (Effects, Background, Visualizers)
+// COMPONENT PHỤ (Đã tối ưu nhẹ)
 // ==========================================
 const CapCutStyleText = ({ text, delay = 120 }) => {
   const words = text.split(' ');
@@ -87,7 +84,7 @@ const CapCutStyleText = ({ text, delay = 120 }) => {
 };
 
 const SakuraRain = () => {
-  const petals = Array.from({ length: 12 });
+  const petals = Array.from({ length: 7 }); // Tối ưu: giảm xuống 7 để nhẹ máy
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
       {petals.map((_, i) => (
@@ -108,16 +105,16 @@ const SakuraRain = () => {
 };
 
 const AnimatedSkyBackground = () => {
-  const floatingItems = Array.from({ length: 15 });
+  const floatingItems = Array.from({ length: 10 }); // Tối ưu: giảm xuống 10
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden aurora-bg z-0 dynamic-bg">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden aurora-bg z-0 opt-bg-main">
       <div className="absolute inset-0 polka-dot-bg opacity-50"></div>
       
       <div className="light-leak bg-pink-400/20 w-[150vw] h-[20vh] top-[20%] -rotate-45"></div>
       <div className="light-leak bg-rose-300/15 w-[150vw] h-[15vh] top-[60%] rotate-45 delay-1000"></div>
 
-      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[radial-gradient(circle,rgba(249,168,212,0.4)_0%,transparent_70%)] animate-blob bg-beat-sync"></div>
-      <div className="absolute top-[40%] right-[-10%] w-[60vw] h-[60vw] bg-[radial-gradient(circle,rgba(253,230,138,0.4)_0%,transparent_70%)] animate-blob animation-delay-2000 bg-beat-sync"></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[radial-gradient(circle,rgba(249,168,212,0.4)_0%,transparent_70%)] animate-blob opt-bg-pulse"></div>
+      <div className="absolute top-[40%] right-[-10%] w-[60vw] h-[60vw] bg-[radial-gradient(circle,rgba(253,230,138,0.4)_0%,transparent_70%)] animate-blob animation-delay-2000 opt-bg-pulse"></div>
 
       {floatingItems.map((_, i) => {
         const type = i % 4;
@@ -133,10 +130,9 @@ const AnimatedSkyBackground = () => {
               transform: `scale(${Math.random() * 0.8 + 0.5})`
             }}
           >
-            {/* Lớp bọc bg-beat-sync để mây/sao nhấp nháy/phồng lên theo tiếng trống */}
-            <div className="bg-beat-sync">
+            <div className="opt-bg-pulse">
               {type === 0 && <Cloud className="text-white fill-white w-12 h-12" />}
-              {type === 1 && <Star className="text-yellow-100 fill-yellow-100 w-4 h-4 beat-star" />}
+              {type === 1 && <Star className="text-yellow-100 fill-yellow-100 w-4 h-4 opt-star" />}
               {type === 2 && (['🐹', '🌻', '🌸', '✨'][Math.floor(Math.random() * 4)])}
               {type === 3 && <Sparkles className="text-pink-300 w-6 h-6 opacity-60" />}
             </div>
@@ -149,22 +145,18 @@ const AnimatedSkyBackground = () => {
 
 const ClickRippleEffect = () => {
   const [ripples, setRipples] = useState([]);
-
   useEffect(() => {
     const handleInteraction = (e) => {
       if(e.target.closest('button') || e.target.closest('input')) return;
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      
       const newRipple = {
-        id: Date.now(),
-        x: clientX, y: clientY,
+        id: Date.now(), x: clientX, y: clientY,
         emoji: ['💖', '✨', '🌸', '🐹', '🎀'][Math.floor(Math.random() * 5)]
       };
       setRipples(prev => [...prev, newRipple]);
       setTimeout(() => setRipples(prev => prev.filter(r => r.id !== newRipple.id)), 1000);
     };
-
     window.addEventListener('touchstart', handleInteraction, {passive: true});
     window.addEventListener('click', handleInteraction);
     return () => {
@@ -172,13 +164,10 @@ const ClickRippleEffect = () => {
       window.removeEventListener('click', handleInteraction);
     };
   }, []);
-
   return (
     <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
       {ripples.map(r => (
-        <div 
-          key={r.id} 
-          className="absolute text-[1.8rem] animate-ripple-pop drop-shadow-md"
+        <div key={r.id} className="absolute text-[1.8rem] animate-ripple-pop drop-shadow-md"
           style={{ left: r.x - 15, top: r.y - 15, willChange: 'transform, opacity' }}
         >
           {r.emoji}
@@ -195,12 +184,8 @@ const BigAudioWave = ({ isPlaying }) => {
       {bars.map((binIndex, i) => (
         <div 
           key={i} 
-          className="w-[10px] bg-gradient-to-t from-[#ff0844] to-[#ffb199] rounded-t-full shadow-[0_0_8px_rgba(255,8,68,0.6)] origin-bottom vis-bar-fallback"
-          style={{ 
-            height: '100%',
-            transform: `scaleY(calc(0.05 + var(--bar-${binIndex}, 0) * 0.95))`,
-            willChange: 'transform'
-          }}
+          className={`w-[10px] bg-gradient-to-t from-[#ff0844] to-[#ffb199] rounded-t-full shadow-[0_0_8px_rgba(255,8,68,0.6)] origin-bottom vis-bar-fallback opt-bar-${binIndex}`}
+          style={{ height: '100%', transform: `scaleY(0.05)`, willChange: 'transform' }}
         ></div>
       ))}
     </div>
@@ -208,7 +193,7 @@ const BigAudioWave = ({ isPlaying }) => {
 };
 
 // ==========================================
-// CHƯƠNG TRÌNH CHÍNH (MAIN APP)
+// MAIN APP
 // ==========================================
 export default function App() {
   const [step, setStep] = useState(1);
@@ -216,7 +201,6 @@ export default function App() {
   const [guestInfo, setGuestInfo] = useState(null);
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
   const [mascotState, setMascotState] = useState('normal'); 
   const [isPlaying, setIsPlaying] = useState(false);
   
@@ -227,88 +211,104 @@ export default function App() {
 
   useEffect(() => {
     const audio = new Audio();
-    audio.crossOrigin = "anonymous"; // Phải set trước khi set src để tránh lỗi load lại trên Safari làm mất user gesture
+    audio.crossOrigin = "anonymous"; 
     audio.src = CONFIG.BGM_URL;
     audio.loop = true;
     audioRef.current = audio;
-
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    }
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }
   }, []);
 
   const initAudioAnalyzer = () => {
     if (analyzerRef.current) return;
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AudioContext();
-      }
+      if (!audioContextRef.current) { audioContextRef.current = new AudioContext(); }
       const ctx = audioContextRef.current;
-      
-      // iOS Safari khởi động AudioContext ở trạng thái "suspended".
-      // Phải gọi resume() trong user gesture để unlock audio.
-      if (ctx.state === 'suspended') {
-        ctx.resume();
-      }
+      if (ctx.state === 'suspended') ctx.resume();
 
       const source = ctx.createMediaElementSource(audioRef.current);
       const analyzer = ctx.createAnalyser();
-      
       analyzer.fftSize = 64; 
       source.connect(analyzer);
       analyzer.connect(ctx.destination);
-      
       analyzerRef.current = analyzer;
+
       const dataArray = new Uint8Array(analyzer.frequencyBinCount);
       const freqBins = [0, 1, 2, 4, 6, 9, 12, 16];
-
       let currentLedAngle = 0;
       let currentLedSpeed = AUDIO_CONFIG.LED_BASE_SPEED; 
       let smoothedGlow = 0;
 
+      // 🚀 TỐI ƯU HIỆU NĂNG: Query DOM 1 LẦN DUY NHẤT
+      const getEls = (className) => document.querySelectorAll(className);
+      
       const analyzeLoop = () => {
         rafRef.current = requestAnimationFrame(analyzeLoop);
         analyzer.getByteFrequencyData(dataArray);
         
-        let bassSum = 0;
-        for(let i = 0; i < 3; i++) bassSum += dataArray[i];
+        let bassSum = dataArray[0] + dataArray[1] + dataArray[2];
         let rawBass = (bassSum / 3) / 255; 
         
-        // 1. THRESHOLD: Lọc sạch tạp âm nhỏ, chỉ bắt nhịp bass thật (Tránh chạy lung tung)
         let cleanBass = Math.max(0, rawBass - AUDIO_CONFIG.BASS_THRESHOLD); 
-        // Phóng đại phần sạch lên để từ 0 -> 1
         cleanBass = cleanBass * (1 / (1 - AUDIO_CONFIG.BASS_THRESHOLD)); 
-        
-        // 2. POWER CURVE: Làm nhịp đập dứt khoát hơn
         let sharpIntensity = Math.pow(cleanBass, AUDIO_CONFIG.BASS_POWER_CURVE); 
         
-        // 3. LERP (Nội suy mượt): Giúp khung ảnh/ảnh phồng lên êm ái, xẹp xuống tự nhiên
-        if (sharpIntensity > smoothedGlow) {
-            smoothedGlow += (sharpIntensity - smoothedGlow) * AUDIO_CONFIG.SMOOTH_ATTACK; 
-        } else {
-            smoothedGlow += (sharpIntensity - smoothedGlow) * AUDIO_CONFIG.SMOOTH_DECAY; 
-        }
+        if (sharpIntensity > smoothedGlow) smoothedGlow += (sharpIntensity - smoothedGlow) * AUDIO_CONFIG.SMOOTH_ATTACK; 
+        else smoothedGlow += (sharpIntensity - smoothedGlow) * AUDIO_CONFIG.SMOOTH_DECAY; 
 
-        // 4. LED ACCELERATION: Tốc độ LED mượt mà. Bass càng đập LED quay càng tít
         let targetSpeed = AUDIO_CONFIG.LED_BASE_SPEED + (sharpIntensity * AUDIO_CONFIG.LED_BEAT_BOOST);
-        currentLedSpeed += (targetSpeed - currentLedSpeed) * 0.15; // Quán tính (inertia)
+        currentLedSpeed += (targetSpeed - currentLedSpeed) * 0.15; 
         currentLedAngle = (currentLedAngle + currentLedSpeed) % 360;
 
-        // Đẩy biến ra CSS
-        document.documentElement.style.setProperty('--beat-glow', sharpIntensity);
-        document.documentElement.style.setProperty('--beat-smooth', smoothedGlow);
-        document.documentElement.style.setProperty('--led-angle', `${currentLedAngle}deg`);
+        // 🚀 BYPASS REACT: TÁC ĐỘNG THẲNG DOM
+        const halos = getEls('.opt-halo');
+        for (let i=0; i<halos.length; i++) {
+          halos[i].style.transform = `rotate(${currentLedAngle}deg)`;
+          halos[i].style.filter = `blur(8px) brightness(${1 + sharpIntensity * 1.5})`;
+          halos[i].style.opacity = 0.7 + sharpIntensity * 0.3;
+        }
+
+        const masks = getEls('.opt-mask');
+        for (let i=0; i<masks.length; i++) {
+          masks[i].style.boxShadow = `0 0 ${15 + sharpIntensity * 20}px rgba(255, 8, 68, ${0.3 + sharpIntensity * 0.4})`;
+        }
+
+        const frames = getEls('.opt-frame');
+        for (let i=0; i<frames.length; i++) {
+          frames[i].style.transform = `scale(${1 + smoothedGlow * AUDIO_CONFIG.MAX_FRAME_SCALE})`;
+        }
+
+        const imgs = getEls('.opt-img');
+        for (let i=0; i<imgs.length; i++) {
+          imgs[i].style.transform = `scale(${1 + smoothedGlow * AUDIO_CONFIG.MAX_IMAGE_SCALE})`;
+        }
+
+        const bgPulses = getEls('.opt-bg-pulse');
+        for (let i=0; i<bgPulses.length; i++) {
+          bgPulses[i].style.transform = `scale(${1 + smoothedGlow * AUDIO_CONFIG.MAX_BG_PULSE})`;
+        }
         
-        // Map dải tần số cho Visualizer sóng biển
+        const mascots = getEls('.opt-mascot');
+        for (let i=0; i<mascots.length; i++) {
+          mascots[i].style.transform = `translateX(-50%) translateY(${sharpIntensity * -12}px) scale(${1 + sharpIntensity * 0.08})`;
+        }
+
+        const names = getEls('.opt-name');
+        for (let i=0; i<names.length; i++) {
+          names[i].style.textShadow = `0 0 ${smoothedGlow * 15}px rgba(255, 8, 68, 0.6)`;
+        }
+
         for(let i = 0; i < 8; i++) {
-          document.documentElement.style.setProperty(`--bar-${i}`, dataArray[freqBins[i]] / 255);
+          let val = dataArray[freqBins[i]] / 255;
+          let bars = getEls(`.opt-bar-${i}`);
+          for (let b=0; b<bars.length; b++) {
+            bars[b].style.transform = `scaleY(${0.05 + val * 0.95})`;
+          }
         }
       };
       analyzeLoop();
-      
     } catch (err) {
-      console.log("CORS chặn đọc sóng âm. Kích hoạt Fallback Animation.");
+      console.log("Audio analyzer fallback:", err);
       document.documentElement.classList.add('audio-fallback');
     }
   };
@@ -322,82 +322,40 @@ export default function App() {
     if (audioRef.current && audioRef.current.paused) {
       if (!audioContextRef.current) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioContextRef.current = new AudioContext();
+        if(AudioContext) audioContextRef.current = new AudioContext();
       }
-      if (audioContextRef.current.state === 'suspended') {
+      if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
         audioContextRef.current.resume();
       }
-      
       initAudioAnalyzer();
-      
-      audioRef.current.play()
-        .then(() => setIsPlaying(true))
-        .catch(e => console.log("Audio play prevented:", e));
+      audioRef.current.play().then(() => setIsPlaying(true)).catch(e => console.log(e));
     }
 
     if (guest) {
       setIsError(false);
       setIsLoading(true);
       setMascotState('happy');
-
       const img = new Image();
       img.src = guest.imageUrl;
-      
-      img.onload = () => {
-        setIsLoading(false);
-        setGuestInfo(guest);
-        setStep(2);
-      };
-      img.onerror = () => {
-        setIsLoading(false);
-        setGuestInfo(guest);
-        setStep(2);
-      };
-
+      img.onload = () => { setIsLoading(false); setGuestInfo(guest); setStep(2); };
+      img.onerror = () => { setIsLoading(false); setGuestInfo(guest); setStep(2); };
     } else {
       setIsError(true);
       setMascotState('surprised');
       if (navigator.vibrate) navigator.vibrate(200);
-      setTimeout(() => {
-        setIsError(false);
-        setMascotState('normal');
-      }, 1000);
+      setTimeout(() => { setIsError(false); setMascotState('normal'); }, 1000);
     }
   };
 
   const handleBack = () => {
-    setStep(1);
-    setGuestId('');
-    setGuestInfo(null);
-    setMascotState('normal');
-  };
-
-  const pokeMascot = () => {
-    setMascotState('happy');
-    if (navigator.vibrate) navigator.vibrate(50);
-    setTimeout(() => setMascotState('normal'), 800);
+    setStep(1); setGuestId(''); setGuestInfo(null); setMascotState('normal');
   };
 
   return (
     <>
       <style dangerouslySetInnerHTML={{__html: `
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Pangolin&display=swap');
-        
-        :root { 
-          --beat-glow: 0;
-          --beat-smooth: 0;
-          --led-angle: 0deg;
-        }
-
-        body {
-          margin: 0;
-          font-family: 'Nunito', sans-serif;
-          user-select: none;
-          -webkit-tap-highlight-color: transparent;
-          touch-action: pan-y; 
-          -webkit-font-smoothing: antialiased;
-        }
-
+        body { margin: 0; font-family: 'Nunito', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: pan-y; -webkit-font-smoothing: antialiased; }
         .font-handwriting { font-family: 'Pangolin', cursive; }
         
         .aurora-bg {
@@ -405,251 +363,70 @@ export default function App() {
           background-size: 200% 200%;
           animation: auroraFlow 15s ease infinite;
         }
-        
-        .dynamic-bg {
-          transform: scale(calc(1 + var(--beat-smooth) * 0.05)) translateY(calc(var(--beat-smooth) * -15px));
-          will-change: transform;
-        }
-
-        /* 5. ĐỒNG BỘ BACKGROUND: Mây, sao, chuột nền phồng lên theo nhịp */
-        .bg-beat-sync {
-          transform: scale(calc(1 + var(--beat-smooth) * ${AUDIO_CONFIG.MAX_BG_PULSE}));
-          will-change: transform;
-        }
-
-        .polka-dot-bg {
-          background-image: radial-gradient(rgba(255, 182, 193, 0.4) 2px, transparent 2px);
-          background-size: 24px 24px;
-        }
-
-        @keyframes auroraFlow {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
+        .polka-dot-bg { background-image: radial-gradient(rgba(255, 182, 193, 0.4) 2px, transparent 2px); background-size: 24px 24px; }
+        @keyframes auroraFlow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
         .breathing-wrapper {
-          animation: cardBreathing 4s ease-in-out infinite;
-          width: 100%;
-          display: flex;
-          justify-content: center;
-          transform: scale(0.8);
-          transform-origin: center center;
+          animation: cardBreathing 4s ease-in-out infinite; width: 100%; display: flex; justify-content: center; transform-origin: center center;
         }
-        @keyframes cardBreathing {
-          0%, 100% { transform: scale(0.75) translateY(0); }
-          50% { transform: scale(0.75) translateY(-12px); }
+        @keyframes cardBreathing { 0%, 100% { transform: scale(0.85) translateY(0); } 50% { transform: scale(0.85) translateY(-12px); } }
+        .card-wrapper { position: relative; z-index: 10; width: 100%; max-width: 355px; }
+
+        /* LED: Đổi conic-gradient fix tĩnh, quay vòng bằng transform (Nhẹ GPU) */
+        .opt-mask { position: absolute; inset: -4px; border-radius: 48px; overflow: hidden; z-index: -1; box-shadow: 0 0 15px rgba(255,8,68,0.3); will-change: box-shadow; }
+        .opt-halo {
+          position: absolute; inset: -50%; border-radius: 50%;
+          background: conic-gradient(from 0deg, transparent 0%, rgba(255,8,68,1) 15%, rgba(255,8,68,1) 25%, transparent 40%, transparent 50%, rgba(188,42,255,1) 65%, rgba(0,242,254,1) 75%, transparent 90%);
+          filter: blur(8px); opacity: 0.7; will-change: transform, filter, opacity;
         }
 
-        .card-wrapper {
-          position: relative;
-          z-index: 10;
-          width: 100%;
-          max-width: 355px; 
-        }
-
-        /* KHU VỰC LED JBL PARTYBOX CẬP NHẬT */
-        .led-mask {
-          position: absolute;
-          inset: -4px; 
-          border-radius: 48px;
-          overflow: hidden;
-          z-index: -1;
-          box-shadow: 0 0 calc(15px + var(--beat-glow) * 20px) rgba(255, 8, 68, calc(0.3 + var(--beat-glow)*0.4));
-          will-change: box-shadow;
-        }
-
-        .cute-halo {
-          position: absolute;
-          inset: -50%;
-          border-radius: 50%;
-          /* Fix dải LED 2 màu chuẩn: Pink Neon và Violet/Cyan Gradient */
-          background: conic-gradient(from var(--led-angle), 
-             transparent 0%, 
-             rgba(255,8,68,1) 15%, 
-             rgba(255,8,68,1) 25%, 
-             transparent 40%, 
-             transparent 50%, 
-             rgba(188,42,255,1) 65%, 
-             rgba(0,242,254,1) 75%, 
-             transparent 90%);
-          /* Chớp lóa độ chói theo Beat */
-          filter: blur(8px) brightness(calc(1 + var(--beat-glow) * 1.5));
-          opacity: calc(0.7 + var(--beat-glow) * 0.3);
-          will-change: filter, opacity;
-        }
-
-        .audio-fallback .cute-halo {
-          animation: fallbackSpin 3s linear infinite, fallbackPulse 0.5s alternate infinite !important;
-        }
+        .audio-fallback .opt-halo { animation: fallbackSpin 3s linear infinite; }
         @keyframes fallbackSpin { 100% { transform: rotate(360deg); } }
-        @keyframes fallbackPulse {
-          0% { filter: blur(8px) brightness(1); opacity: 0.6; }
-          100% { filter: blur(8px) brightness(1.5); opacity: 1; }
-        }
-        
         .audio-fallback .vis-bar-fallback { animation: fallbackWave 0.8s ease-in-out infinite alternate; }
         .audio-fallback .vis-bar-fallback:nth-child(2n) { animation-delay: 0.2s; }
-        .audio-fallback .vis-bar-fallback:nth-child(3n) { animation-delay: 0.4s; }
-        .audio-fallback .vis-bar-fallback:nth-child(4n) { animation-delay: 0.6s; }
-        @keyframes fallbackWave {
-          0% { transform: scaleY(0.1); }
-          100% { transform: scaleY(1); }
-        }
+        @keyframes fallbackWave { 0% { transform: scaleY(0.1); } 100% { transform: scaleY(1); } }
 
-        .pillow-panel {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(15px);
-          border-radius: 45px;
-          border: 4px solid #fff;
-          box-shadow: inset 0 0 calc(20px + var(--beat-smooth) * 20px) rgba(255, 8, 68, calc(0.05 + var(--beat-smooth) * 0.15));
-          overflow: hidden;
-          position: relative;
-        }
+        .pillow-panel { background: rgba(255, 255, 255, 0.95); border-radius: 45px; border: 4px solid #fff; position: relative; overflow: hidden; }
+        .opt-frame { will-change: transform; }
+        .opt-img { will-change: transform; transition: transform 0.05s ease-out; }
+        .opt-bg-pulse { will-change: transform; }
+        .opt-mascot { will-change: transform; transform: translateX(-50%); }
+        .opt-name { will-change: text-shadow; }
 
-        /* 3. PARALLAX KHUNG VÀ ẢNH ĐẬP (BEAT) */
-        /* Cả khung trắng đập */
-        .frame-beat {
-          transform: scale(calc(1 + var(--beat-smooth) * ${AUDIO_CONFIG.MAX_FRAME_SCALE})) rotate(-2deg);
-          will-change: transform;
-        }
-        
-        /* Ảnh bên trong khung đập MẠNH HƠN, tạo cảm giác màng loa */
-        .frame-beat img {
-          transform: scale(calc(1 + var(--beat-smooth) * ${AUDIO_CONFIG.MAX_IMAGE_SCALE}));
-          will-change: transform;
-          transition: transform 0.05s ease-out; /* Mượt hóa ảnh */
-        }
+        .light-leak { position: absolute; left: -200%; filter: blur(40px); animation: leakSweep 6s linear infinite; mix-blend-mode: overlay; z-index: 1; }
+        @keyframes leakSweep { 0%, 10% { left: -200%; opacity: 0; } 20% { opacity: 0.6; } 30%, 100% { left: 200%; opacity: 0; } }
 
-        .name-beat {
-          text-shadow: 0 0 calc(var(--beat-smooth) * 15px) rgba(255, 8, 68, 0.6);
-          will-change: text-shadow;
-        }
+        .noise-overlay { position: absolute; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); opacity: 0.04; mix-blend-mode: multiply; pointer-events: none; z-index: 0; }
+        .glass-glare { position: absolute; top: 0; left: -150%; width: 60%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: glareSweep 4.5s cubic-bezier(0.25, 1, 0.5, 1) infinite; z-index: 5; pointer-events: none; }
+        @keyframes glareSweep { 0% { left: -150%; } 40%, 100% { left: 200%; } }
 
-        .beat-star {
-          opacity: calc(0.4 + var(--beat-smooth) * 0.6);
-        }
-
-        .mascot-bop {
-          transform: translateX(-50%) translateY(calc(var(--beat-glow) * -12px)) scale(calc(1 + var(--beat-glow) * 0.08));
-          will-change: transform;
-        }
-
-        .light-leak {
-          position: absolute;
-          left: -200%;
-          filter: blur(40px);
-          animation: leakSweep 6s linear infinite;
-          mix-blend-mode: overlay;
-          z-index: 1;
-        }
-        @keyframes leakSweep {
-          0%, 10% { left: -200%; opacity: 0; }
-          20% { opacity: 0.6; }
-          30%, 100% { left: 200%; opacity: 0; }
-        }
-
-        .noise-overlay {
-          position: absolute;
-          inset: 0;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-          opacity: 0.04;
-          mix-blend-mode: multiply;
-          pointer-events: none;
-          z-index: 0;
-        }
-
-        .glass-glare {
-          position: absolute;
-          top: 0; left: -150%;
-          width: 60%; height: 100%;
-          background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
-          transform: skewX(-25deg);
-          animation: glareSweep 4.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
-          z-index: 5;
-          pointer-events: none;
-        }
-        @keyframes glareSweep {
-          0% { left: -150%; }
-          40%, 100% { left: 200%; }
-        }
-
-        @keyframes sakuraFall {
-          0% { transform: translate3d(0, -10vh, 0) rotate(0deg) scale(1); opacity: 1; }
-          100% { transform: translate3d(30vw, 110vh, 0) rotate(360deg) scale(0.6); opacity: 0; }
-        }
+        @keyframes sakuraFall { 0% { transform: translate3d(0, -10vh, 0) rotate(0deg) scale(1); opacity: 1; } 100% { transform: translate3d(30vw, 110vh, 0) rotate(360deg) scale(0.6); opacity: 0; } }
         .animate-sakura-fall { animation: sakuraFall linear infinite forwards; }
 
-        .bubbly-input {
-          border-radius: 40px;
-          background: #fff5f8;
-          box-shadow: inset 0 6px 15px rgba(255, 182, 193, 0.25);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          position: relative;
-          z-index: 10;
-        }
-        .bubbly-input:focus {
-          transform: scale(1.05);
-          box-shadow: inset 0 6px 15px rgba(255, 182, 193, 0.1), 0 0 0 4px rgba(255, 182, 193, 0.4);
-        }
+        .bubbly-input { border-radius: 40px; background: #fff5f8; box-shadow: inset 0 6px 15px rgba(255, 182, 193, 0.25); transition: all 0.3s; position: relative; z-index: 10; }
+        .bubbly-input:focus { transform: scale(1.05); box-shadow: inset 0 6px 15px rgba(255, 182, 193, 0.1), 0 0 0 4px rgba(255, 182, 193, 0.4); }
 
-        .polaroid-float-wrapper {
-          animation: floatImage 4s ease-in-out infinite;
-          position: relative;
-          overflow: visible;
-          width: 100%;
-          display: flex;
-          justify-content: center;
-          margin-bottom: 1rem;
-        }
-        @keyframes floatImage {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
-        }
+        .polaroid-float-wrapper { animation: floatImage 4s ease-in-out infinite; position: relative; width: 100%; display: flex; justify-content: center; margin-bottom: 1rem; }
+        @keyframes floatImage { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-        @keyframes floatSky {
-          0% { transform: translateY(0) scale(var(--tw-scale-x, 1)) rotate(0deg); opacity: 0; }
-          10% { opacity: var(--tw-opacity, 0.8); }
-          90% { opacity: var(--tw-opacity, 0.8); }
-          100% { transform: translateY(-120vh) scale(var(--tw-scale-x, 1)) rotate(20deg); opacity: 0; }
-        }
+        @keyframes floatSky { 0% { transform: translateY(0) scale(var(--tw-scale-x, 1)) rotate(0deg); opacity: 0; } 10%, 90% { opacity: var(--tw-opacity, 0.8); } 100% { transform: translateY(-120vh) scale(var(--tw-scale-x, 1)) rotate(20deg); opacity: 0; } }
         .animate-float-sky { animation: floatSky linear infinite forwards; }
 
-        @keyframes ripplePop {
-          0% { transform: scale(0.3) translateY(0) rotate(-10deg); opacity: 1; }
-          40% { transform: scale(1.8) translateY(-30px) rotate(10deg); opacity: 1; }
-          100% { transform: scale(2.5) translateY(-60px) rotate(20deg); opacity: 0; }
-        }
+        @keyframes ripplePop { 0% { transform: scale(0.3) translateY(0) rotate(-10deg); opacity: 1; } 40% { transform: scale(1.8) translateY(-30px) rotate(10deg); opacity: 1; } 100% { transform: scale(2.5) translateY(-60px) rotate(20deg); opacity: 0; } }
         .animate-ripple-pop { animation: ripplePop 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
         .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake {
-          10%, 90% { transform: translate3d(-3px, 0, 0) rotate(-2deg); }
-          20%, 80% { transform: translate3d(5px, 0, 0) rotate(2deg); }
-          30%, 50%, 70% { transform: translate3d(-8px, 0, 0) rotate(-4deg); }
-          40%, 60% { transform: translate3d(8px, 0, 0) rotate(4deg); }
-        }
+        @keyframes shake { 10%, 90% { transform: translate3d(-3px, 0, 0) rotate(-2deg); } 20%, 80% { transform: translate3d(5px, 0, 0) rotate(2deg); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0) rotate(-4deg); } 40%, 60% { transform: translate3d(8px, 0, 0) rotate(4deg); } }
 
         .bounce-mascot { animation: bounceMascot 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes bounceMascot {
-          0%, 100% { transform: translateY(0) scale(1); }
-          50% { transform: translateY(-20px) scale(1.15); }
-        }
+        @keyframes bounceMascot { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.15); } }
 
         .btn-pulse { animation: btnPulse 2s infinite; }
-        @keyframes btnPulse {
-          0%, 100% { box-shadow: 0 8px 0 #d81b60, 0 15px 25px rgba(255,105,180,0.4), 0 0 0 rgba(255,105,180,0); }
-          50% { box-shadow: 0 8px 0 #d81b60, 0 15px 25px rgba(255,105,180,0.4), 0 0 20px rgba(255,105,180,0.6); }
-        }
+        @keyframes btnPulse { 0%, 100% { box-shadow: 0 8px 0 #d81b60, 0 15px 25px rgba(255,105,180,0.4), 0 0 0 rgba(255,105,180,0); } 50% { box-shadow: 0 8px 0 #d81b60, 0 15px 25px rgba(255,105,180,0.4), 0 0 20px rgba(255,105,180,0.6); } }
 
-        .cute-scrollbar::-webkit-scrollbar { width: 5px; }
-        .cute-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .cute-scrollbar::-webkit-scrollbar-thumb { background: #ffb6c1; border-radius: 10px; }
-        
-        .delay-1000 { animation-delay: 1s; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        
-        .panel-enter { opacity: 1; pointer-events: auto; }
-        .panel-hidden { opacity: 0; pointer-events: none; }
+        .cute-scrollbar::-webkit-scrollbar { width: 5px; } .cute-scrollbar::-webkit-scrollbar-track { background: transparent; } .cute-scrollbar::-webkit-scrollbar-thumb { background: #ffb6c1; border-radius: 10px; }
+        .delay-1000 { animation-delay: 1s; } .animation-delay-2000 { animation-delay: 2s; }
+        .panel-enter { opacity: 1; pointer-events: auto; } .panel-hidden { opacity: 0; pointer-events: none; }
       `}} />
 
       <main className="relative w-screen h-screen overflow-hidden flex items-center justify-center p-4">
@@ -658,20 +435,13 @@ export default function App() {
         <ClickRippleEffect />
 
         {/* MÀN HÌNH 1: NHẬP ID */}
-        <div 
-          className={`absolute transition-all duration-[600ms] ease-in-out z-10 w-full flex justify-center ${
-            step === 1 ? 'panel-enter' : 'panel-hidden'
-          }`}
-        >
+        <div className={`absolute transition-all duration-[600ms] ease-in-out z-10 w-full flex justify-center ${step === 1 ? 'panel-enter' : 'panel-hidden'}`}>
           <div className="breathing-wrapper">
             <div className={`card-wrapper ${isError ? 'shake' : ''}`}>
-              <div className="led-mask">
-                <div className="cute-halo"></div>
-              </div>
+              <div className="opt-mask"><div className="opt-halo"></div></div>
               
-              <div 
-                onClick={pokeMascot}
-                className={`mascot-bop absolute -top-14 left-1/2 bg-white/95 p-3 rounded-full shadow-[0_15px_30px_rgba(255,182,193,0.6)] border-[5px] border-pink-100 cursor-pointer active:scale-90 z-30 ${mascotState === 'happy' ? 'bounce-mascot' : ''}`}
+              <div onClick={() => { setMascotState('happy'); setTimeout(() => setMascotState('normal'), 800); }}
+                className={`opt-mascot absolute -top-14 left-1/2 bg-white/95 p-3 rounded-full shadow-[0_15px_30px_rgba(255,182,193,0.6)] border-[5px] border-pink-100 cursor-pointer active:scale-90 z-30 ${mascotState === 'happy' ? 'bounce-mascot' : ''}`}
               >
                 <div className="text-[3.2rem] leading-none drop-shadow-md flex items-center justify-center w-[55px] h-[55px]">
                   {mascotState === 'normal' ? '🐹' : mascotState === 'happy' ? '🐹✨' : '🐭💧'}
@@ -679,14 +449,13 @@ export default function App() {
               </div>
               
               <div className="pillow-panel p-7 pt-12 pb-14 flex flex-col items-center text-center">
-                <div className="noise-overlay"></div>
-                <div className="glass-glare"></div>
+                <div className="noise-overlay"></div><div className="glass-glare"></div>
                 
-                <h1 className="font-handwriting text-[2.6rem] text-[#d81b60] font-bold mb-4 mt-3 drop-shadow-sm leading-tight relative z-10 flex items-center justify-center gap-1 name-beat">
+                <h1 className="font-handwriting text-[2.6rem] text-[#d81b60] font-bold mb-4 mt-3 drop-shadow-sm leading-tight relative z-10 flex items-center justify-center gap-1 opt-name">
                   {CONFIG.DATA.e.eventTitle}
                 </h1>
                 
-                <div className="bg-pink-50/95 rounded-[1.5rem] p-4 mb-6 border-2 border-pink-100 relative shadow-inner z-10 w-full frame-beat">
+                <div className="bg-pink-50/95 rounded-[1.5rem] p-4 mb-6 border-2 border-pink-100 relative shadow-inner z-10 w-full opt-frame">
                   <Sparkles className="absolute -top-3 -left-3 text-yellow-400 fill-yellow-400 w-6 h-6 animate-pulse drop-shadow-sm" />
                   <p className="text-rose-600 font-bold text-[15px] leading-relaxed tracking-wide">
                     {CONFIG.DATA.e.hostMessage}
@@ -694,13 +463,7 @@ export default function App() {
                 </div>
 
                 <div className="w-full relative mb-7 z-10">
-                  <input
-                    type="text"
-                    value={guestId}
-                    onChange={(e) => setGuestId(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleOpen()}
-                    placeholder="Nhập số thứ tự của bạn"
-                    disabled={isLoading}
+                  <input type="text" value={guestId} onChange={(e) => setGuestId(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleOpen()} placeholder="Nhập số thứ tự của bạn" disabled={isLoading}
                     className="bubbly-input w-full px-5 py-[16px] border-2 border-transparent text-center text-rose-600 font-extrabold text-[1rem] placeholder-pink-300 focus:outline-none"
                   />
                   {isError && (
@@ -714,24 +477,15 @@ export default function App() {
                   <span>🎧</span> Bật nhạc max ping để quẩy nhé! <span>🎶</span>
                 </div>
 
-                <button
-                  onClick={handleOpen}
-                  disabled={isLoading}
+                <button onClick={handleOpen} disabled={isLoading}
                   className="group relative flex items-center justify-center gap-3 px-6 py-[16px] bg-gradient-to-r from-[#ff0844] to-[#ff8da1] text-white font-bold text-[1.1rem] rounded-full btn-pulse hover:-translate-y-1 active:translate-y-2 active:shadow-[0_0px_0_#d81b60,0_5px_10px_rgba(255,105,180,0.5)] transition-all w-full disabled:opacity-80 disabled:transform-none z-10"
                 >
-                  {isLoading ? (
-                    <span className="flex items-center gap-2 font-handwriting text-[1.3rem]">
-                      Đợi xíu nha... 🏃💨
-                    </span>
-                  ) : (
-                    <>
-                      <Music size={20} className={`fill-white ${isPlaying ? 'animate-bounce' : ''}`} />
+                  {isLoading ? <span className="flex items-center gap-2 font-handwriting text-[1.3rem]">Đợi xíu nha... 🏃💨</span> : (
+                    <><Music size={20} className={`fill-white ${isPlaying ? 'animate-bounce' : ''}`} />
                       <span className="font-handwriting text-[1.4rem] mt-1 tracking-wide">Mở thiệp thui</span>
-                      <Music size={20} className={`fill-white ${isPlaying ? 'animate-bounce' : ''}`} />
-                    </>
+                      <Music size={20} className={`fill-white ${isPlaying ? 'animate-bounce' : ''}`} /></>
                   )}
                 </button>
-
                 <BigAudioWave isPlaying={isPlaying} />
               </div>
             </div>
@@ -739,55 +493,40 @@ export default function App() {
         </div>
 
         {/* MÀN HÌNH 2: KẾT QUẢ */}
-        <div 
-          className={`absolute transition-all duration-[600ms] ease-out z-20 w-full flex justify-center ${
-            step === 2 ? 'panel-enter' : 'panel-hidden'
-          }`}
-        >
-
-          
+        <div className={`absolute transition-all duration-[600ms] ease-out z-20 w-full flex justify-center ${step === 2 ? 'panel-enter' : 'panel-hidden'}`}>
           <div className="breathing-wrapper">
             <div className="card-wrapper">
-              
-              <div className="led-mask">
-                <div className="cute-halo"></div>
-              </div>
+              <div className="opt-mask"><div className="opt-halo"></div></div>
               
               <div className="pillow-panel p-6 pt-10 pb-12 flex flex-col items-center relative overflow-hidden">
                 <div className="noise-overlay"></div>
                 
-                <button 
-                  onClick={handleBack}
-                  className="absolute top-4 left-4 w-10 h-10 bg-white/95 rounded-full flex items-center justify-center text-[#ff69b4] shadow-[0_4px_10px_rgba(255,182,193,0.4)] border-2 border-pink-50 hover:bg-pink-50 active:scale-90 transition-all z-20"
-                >
+                <button onClick={handleBack} className="absolute top-4 left-4 w-10 h-10 bg-white/95 rounded-full flex items-center justify-center text-[#ff69b4] shadow-[0_4px_10px_rgba(255,182,193,0.4)] border-2 border-pink-50 hover:bg-pink-50 active:scale-90 transition-all z-20">
                   <ArrowLeft size={22} strokeWidth={4} />
                 </button>
 
-                {/* Bọc thêm wrapper Float để tách biệt 2 hiệu ứng Float (trôi bồng bềnh) và Beat (phồng to) */}
                 <div className="polaroid-float-wrapper z-10 animate-[popIn_0.5s_0.1s_both]">
-                  <div className="relative bg-white p-3 pb-8 rounded-2xl shadow-[0_15px_35px_rgba(255,105,180,0.3)] cursor-pointer group frame-beat">
+                  <div className="relative bg-white p-3 pb-8 rounded-2xl shadow-[0_15px_35px_rgba(255,105,180,0.3)] cursor-pointer group opt-frame">
                     <div className="absolute -top-[14px] left-1/2 -translate-x-1/2 w-[80px] h-[30px] bg-[rgba(255,182,193,0.85)] rounded-[4px] shadow-[0_4px_8px_rgba(0,0,0,0.1)] z-10 -rotate-3 bg-[radial-gradient(rgba(255,255,255,0.6)_2px,transparent_2px)] bg-[length:10px_10px]"></div>
                     <div className="glass-glare"></div>
                     <div className="w-[180px] h-[200px] rounded-xl overflow-hidden bg-pink-50 border-2 border-dashed border-pink-200 flex items-center justify-center group-active:scale-95 transition-transform">
-                      <img src={guestInfo?.imageUrl} alt="Guest" className="w-full h-full object-cover" />
+                      <img src={guestInfo?.imageUrl} alt="Guest" className="w-full h-full object-cover opt-img" />
                     </div>
                     <div className="absolute bottom-2 right-3 text-2xl rotate-12 group-hover:animate-spin">🎀</div>
                   </div>
                 </div>
 
-                <h2 className="font-handwriting text-[2.2rem] text-[#d81b60] font-bold mb-3 text-center leading-tight drop-shadow-sm relative z-10 animate-[popIn_0.5s_0.3s_both] flex items-center justify-center gap-2 name-beat">
+                <h2 className="font-handwriting text-[2.2rem] text-[#d81b60] font-bold mb-3 text-center leading-tight drop-shadow-sm relative z-10 animate-[popIn_0.5s_0.3s_both] flex items-center justify-center gap-2 opt-name">
                   {guestInfo?.name || "Bạn dễ thương"}
                 </h2>
                 
-                <div className="w-full bg-[#fff5f8]/95 rounded-[1.5rem] p-5 border-2 border-white shadow-inner flex flex-col items-center relative h-auto min-h-[120px] max-h-[25vh] overflow-y-auto cute-scrollbar z-10 animate-[popIn_0.5s_0.5s_both] frame-beat">
+                <div className="w-full bg-[#fff5f8]/95 rounded-[1.5rem] p-5 border-2 border-white shadow-inner flex flex-col items-center relative h-auto min-h-[120px] max-h-[25vh] overflow-y-auto cute-scrollbar z-10 animate-[popIn_0.5s_0.5s_both] opt-frame">
                   <div className="text-[#c2185b] font-bold text-[1.1rem] leading-[1.6] text-center w-full">
-                    {step === 2 && guestInfo && (
-                      <CapCutStyleText text={guestInfo.wishes} delay={100} />
-                    )}
+                    {step === 2 && guestInfo && <CapCutStyleText text={guestInfo.wishes} delay={100} />}
                   </div>
                 </div>
                 
-                <div className="mt-5 mb-2 flex gap-4 relative z-10 animate-[popIn_0.5s_0.6s_both] frame-beat">
+                <div className="mt-5 mb-2 flex gap-4 relative z-10 animate-[popIn_0.5s_0.6s_both] opt-frame">
                    <div className="w-11 h-11 bg-pink-100 rounded-full flex items-center justify-center text-xl shadow-inner animate-bounce hover:scale-125 cursor-pointer transition-transform" style={{animationDelay: '0s'}}>🌸</div>
                    <div className="w-11 h-11 bg-pink-100 rounded-full flex items-center justify-center text-xl shadow-inner animate-bounce hover:scale-125 cursor-pointer transition-transform" style={{animationDelay: '0.15s'}}>🐹</div>
                    <div className="w-11 h-11 bg-pink-100 rounded-full flex items-center justify-center text-xl shadow-inner animate-bounce hover:scale-125 cursor-pointer transition-transform" style={{animationDelay: '0.3s'}}>🌻</div>
