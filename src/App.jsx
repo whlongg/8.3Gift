@@ -5,7 +5,7 @@ import { Heart, Sparkles, ArrowLeft, Star, Cloud, Music } from 'lucide-react';
 // ⚙️ 1. CONFIGURATION & DATA (Chỉnh Text & Ảnh ở đây)
 // ==========================================
 const CONFIG = {
-  BGM_URL: "/Magnetic.mp3",
+  BGM_URL: "https://cdn.pixabay.com/audio/2026/03/09/audio_4e7712178b.mp3",
   DATA: {
     "e": {
       "eventTitle": "Thiệp mời 8/3",
@@ -40,7 +40,7 @@ const CONFIG = {
 const AUDIO_CONFIG = {
   BASS_THRESHOLD: 0.85,     // Ngưỡng lọc tạp âm (0.0 -> 1.0). Càng cao càng chỉ bắt tiếng Bass mạnh (không bắt nhầm).
   BASS_POWER_CURVE: 2.5,   // Độ gắt của nhịp đập (Hàm mũ). Số càng lớn đập càng dứt khoát.
-  LED_BASE_SPEED: 0.2,    // Tốc độ chạy viền LED lúc bình thường (Cực chậm, mượt).
+  LED_BASE_SPEED: 0.4,    // Tốc độ chạy viền LED lúc bình thường (Cực chậm, mượt).
   LED_BEAT_BOOST: 2.7,     // Độ tăng tốc của LED khi có tiếng trống đập.
   SMOOTH_ATTACK: 0.35,     // Tốc độ "Phồng lên" của khung ảnh & nền khi có beat.
   SMOOTH_DECAY: 0.05,      // Tốc độ "Xẹp xuống" êm ái khi dứt beat.
@@ -220,14 +220,14 @@ export default function App() {
   const [mascotState, setMascotState] = useState('normal'); 
   const [isPlaying, setIsPlaying] = useState(false);
   
+  const audioContextRef = useRef(null);
   const audioRef = useRef(null);
   const analyzerRef = useRef(null);
   const rafRef = useRef(null);
 
   useEffect(() => {
     const audio = new Audio();
-    // Không set crossOrigin mặc định — iOS Safari sẽ block playback
-    // nếu CDN không có CORS header. crossOrigin chỉ cần cho AudioContext analyzer.
+    audio.crossOrigin = "anonymous"; // Phải set trước khi set src để tránh lỗi load lại trên Safari làm mất user gesture
     audio.src = CONFIG.BGM_URL;
     audio.loop = true;
     audioRef.current = audio;
@@ -241,14 +241,16 @@ export default function App() {
     if (analyzerRef.current) return;
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
-      const ctx = new AudioContext();
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext();
+      }
+      const ctx = audioContextRef.current;
+      
       // iOS Safari khởi động AudioContext ở trạng thái "suspended".
       // Phải gọi resume() trong user gesture để unlock audio.
-      ctx.resume();
-
-      // Cần crossOrigin để dùng createMediaElementSource — thử set lại.
-      // Nếu CDN không có CORS thì sẽ throw và fallback.
-      audioRef.current.crossOrigin = "anonymous";
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
 
       const source = ctx.createMediaElementSource(audioRef.current);
       const analyzer = ctx.createAnalyser();
@@ -318,7 +320,16 @@ export default function App() {
     const guest = CONFIG.DATA.g.find((item) => item.id === trimmedId || item.id === normalizedId);
 
     if (audioRef.current && audioRef.current.paused) {
+      if (!audioContextRef.current) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioContextRef.current = new AudioContext();
+      }
+      if (audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume();
+      }
+      
       initAudioAnalyzer();
+      
       audioRef.current.play()
         .then(() => setIsPlaying(true))
         .catch(e => console.log("Audio play prevented:", e));
