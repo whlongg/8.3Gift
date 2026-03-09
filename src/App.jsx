@@ -99,8 +99,7 @@ const SakuraRain = () => {
             height: `${Math.random() * 8 + 6}px`,
             left: `${Math.random() * 100}vw`,
             animationDuration: `${Math.random() * 5 + 6}s`,
-            animationDelay: `-${Math.random() * 6}s`,
-            willChange: 'transform, opacity'
+            animationDelay: `-${Math.random() * 6}s`
           }}
         />
       ))}
@@ -678,7 +677,7 @@ export default function App() {
                     value={guestId}
                     onChange={(e) => setGuestId(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleOpen()}
-                    placeholder="Nhập mã của bạn vô đây nè"
+                    placeholder="Nhập số thứ tự của bạn"
                     disabled={isLoading}
                     className="bubbly-input w-full px-5 py-[16px] border-2 border-transparent text-center text-rose-600 font-extrabold text-[1rem] placeholder-pink-300 focus:outline-none"
                   />
@@ -723,7 +722,7 @@ export default function App() {
             step === 2 ? 'panel-enter' : 'panel-hidden'
           }`}
         >
-          {step === 2 && <ClickRippleEffect />} 
+
           
           <div className="breathing-wrapper">
             <div className="card-wrapper">
