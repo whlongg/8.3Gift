@@ -12,6 +12,7 @@ const CONFIG = {
       "hostMessage": "Chào đằng ấy! Rất vui vì có bạn trong buổi gặp mặt này. Hy vọng chúng ta sẽ có thật nhiều kỷ niệm siêu cấp đáng yêu cùng nhau nhé! 🐹💖"
     },
     "g": [
+    {"id":"999","name":"Nguyễn Thị Thanh Tâm","imageUrl":"https://i.ibb.co/8gJGkCcs/IMG-0528.jpg","wishes":"Chúc cô Tâm và gia đình nhiều sức khoẻ, gặp may mắn trong công việc và có nhiều học sinh đạt kết quả cao."},
     {"id":"3","name":"Trần Thị Nguyệt Anh","imageUrl":"https://i.ibb.co/VpjzjzZF/Nguy-t-Anh-17-07-2008.jpg","wishes":"Chúc Nguyệt Anh luôn giữ nụ cười rạng rỡ và gặp thật nhiều điều may mắn trong chặng đường phía trước."},
     {"id":"4","name":"Tạ Trần Ánh","imageUrl":"https://i.ibb.co/rRtHqtx6/Tr-n-nh-15-07-2008.jpg","wishes":"Chúc Ánh luôn tỏa sáng theo cách riêng của mình và có thật nhiều trải nghiệm đáng nhớ."},
     {"id":"7","name":"Nguyễn Dương Ngọc Bích","imageUrl":"https://i.ibb.co/B24j37ht/Duong-Bich-13-11-2008.jpg","wishes":"Chúc Ngọc Bích luôn tràn đầy năng lượng tích cực và đạt được những mục tiêu mà bạn mong muốn."},
